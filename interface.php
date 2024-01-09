@@ -33,8 +33,6 @@ require_once('banco.php');
 
     <h2>Visualizar Investimento</h2>
     <form action="API.php" method="get">
-        <label for="data">Data atual:</label>
-        <input type="date" id="data" name="data" required>
 
         <label for="id_investimento">ID do Investimento:</label>
         <input type="number" id="id_investimento" name="id_investimento" required>

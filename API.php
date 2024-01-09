@@ -2,13 +2,13 @@
 
 require_once('banco.php');
 
-// Endpoint para criar um investimento
+// criando o investimento
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $usuario = $_POST['usuario'];
     $data_criacao = $_POST['data_criacao'];
     $valor_inicial = $_POST['valor_inicial'];
-    $data_input = $_POST['data'];
-
+    $data_atual = date('Y-m-d');
+    
     // Validar dados e garantir que o investimento não seja negativo
     if (strtotime($data_criacao) > strtotime($data_atual)) {
         echo "Erro: A data de criação não pode ser futura.";
@@ -23,17 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Função para calcular o ganho composto mensal
+// calculo do ganho mensal
 function calcularGanhoMensal($valor_inicial, $data_criacao, $data_atual) {
     $taxa_juros_mensal = 0.0052;
-
-    $diferenca_meses = (strtotime($data_atual) - strtotime($data_criacao)) / (60 * 60 * 24 * 30); // Meses de diferença
+    $diferenca_meses = (strtotime($data_atual) - strtotime($data_criacao)) / (60 * 60 * 24 * 30);
     $ganho_total = $valor_inicial * pow(1 + $taxa_juros_mensal, $diferenca_meses);
 
     return $ganho_total - $valor_inicial;
 }
 
-// Endpoint para visualizar um investimento
+// visualizar um investimento
  if($_SERVER['REQUEST_METHOD'] === 'GET'  && isset($_GET['id_investimento'])){
     $id_investimento = $_GET['id_investimento'];
 
@@ -44,14 +43,17 @@ function calcularGanhoMensal($valor_inicial, $data_criacao, $data_atual) {
     if ($resultado->num_rows > 0) {
         $linha = $resultado->fetch_assoc();
 
-        // Calcular o saldo esperado considerando o ganho composto
-        $data_input = $_POST['data'] ?? 0;
-        $data_atual = date('Y-m-d', strtotime($data_input));
+        // Calcular o saldo esperado
+        $data_atual = date('Y-m-d');
         $ganho_mensal = calcularGanhoMensal($linha['valor_inicial'], $linha['data_criacao'], $data_atual);
         $saldo_esperado = $linha['valor_inicial'] + $ganho_mensal;
+        
 
+        header('Content-Type: application/json');
         echo json_encode(['investimento' => [
+            'proprietario' => $linha['usuario'],
             'valor_inicial' => $linha['valor_inicial'],
+            'data_inicial' => $linha['data_criacao'],
             'saldo_esperado' => $saldo_esperado,
         ]]);
     } else {
