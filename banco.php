@@ -19,7 +19,7 @@ if ($conexao->query($criabanco) === TRUE) {
 /*
 $criatabela = "CREATE TABLE investimentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    dono VARCHAR(255) NOT NULL,
+    usuario VARCHAR(255) NOT NULL,
     data_criacao DATE NOT NULL,
     valor_inicial DECIMAL(10, 2) NOT NULL
 )";

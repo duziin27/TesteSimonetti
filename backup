@@ -1,0 +1,30 @@
+area usada para codigos antes de alterar
+
+//listar investimentos de uma pessoa com paginação
+elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['usuario'])) {
+    $usuario = $_GET['usuario'];
+    $pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+    $por_pagina = 10;
+    $offset = ($pagina - 1) * $por_pagina;
+
+    $sql = "SELECT * FROM investimentos WHERE usuario = '$usuario' LIMIT $por_pagina OFFSET $offset";
+
+    $resultado = $conexao->query($sql);
+
+    $investimentos = [];
+    while ($linha = $resultado->fetch_assoc()) {
+        // Calcular o saldo esperado considerando o ganho composto
+        $data_input = $_POST['data'] ?? 1;
+        $data_atual = date('Y-m-d', strtotime($data_input));
+        $ganho_mensal = calcularGanhoMensal($linha['valor_inicial'], $linha['data_criacao'], $data_atual);
+        $saldo_esperado = $linha['valor_inicial'] + $ganho_mensal;
+
+        $investimentos[] = [
+            'id' => $linha['id'],
+            'valor_inicial' => $linha['valor_inicial'],
+            'saldo_esperado' => $saldo_esperado,
+        ];
+    }
+
+    echo json_encode(['investimentos' => $investimentos]);
+}
